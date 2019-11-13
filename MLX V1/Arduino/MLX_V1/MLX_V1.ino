@@ -2,7 +2,7 @@
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
 
-char IP_DEVICE[] = "35.175.238.71";
+char IP_DEVICE[] = "54.198.221.114";
 
 
 
