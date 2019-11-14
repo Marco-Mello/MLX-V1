@@ -2,10 +2,11 @@
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
 
-char IP_DEVICE[] = "54.198.221.114";
+char IP_WEBSERVER[] = "54.198.221.114";
+char ID_DEVICE[] = "M3LL0"; //M3LL0 ou X1C0X
 
 
-
+int temperatura_anterior = 0;
 
 
 //  destino += IP_DEVICE;
@@ -33,7 +34,8 @@ void loop() {
    HTTPClient http;    //Declare object of class HTTPClient
 
    String destino = "http://";
-   destino = destino + IP_DEVICE;
+   destino = destino + IP_WEBSERVER;
+   destino = destino + "/" + ID_DEVICE;
    destino = destino + "/temperatura";
    
    http.begin(destino);      //Specify request destination
@@ -42,7 +44,11 @@ void loop() {
   StaticJsonDocument<200> doc;
     JsonArray analogValues = doc.createNestedArray("analog");
 
-    int value = analogRead(0);
+
+    int value = 0;
+    for(int i = 0 ; i < 10 ; i++) value = value + analogRead(0);
+
+    value = value/10;
 
 
     //CONVERSAO PARA O APPPPPPPPPPPPPP <<<<<<<<<<<<<<<<<<<<<<<<<
@@ -62,13 +68,18 @@ void loop() {
   serializeJson(doc, SerializadoJson);
 
 
-
- 
-   int httpCode = http.POST(SerializadoJson);   //Send the request
+ if(temperatura_anterior == value ) {}
+ else {
+  
+    int httpCode = http.POST(SerializadoJson);   //Send the request
    String payload = http.getString();                  //Get the response payload
  
    Serial.println(httpCode);   //Print HTTP return code
    Serial.println(payload);    //Print request response payload
+  temperatura_anterior = value;
+  }
+ 
+   
  
    http.end();  //Close connection
  
@@ -78,6 +89,6 @@ void loop() {
  
  }
  
-  delay(1000);  //Send a request every 30 seconds
+  delay(10);  //Send a request every 30 seconds
  
 }
